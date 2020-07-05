@@ -53,45 +53,16 @@ namespace pub_sub
             return result;
         }
 
-
         private decimal? ProcessBySeconds(int numberOfSeconds)
         {
             var cutoffTimestamp = DateTime.Now.AddSeconds(numberOfSeconds * -1);
-            this.allMarketData.RemoveAll(md => md.DateTime < cutoffTimestamp);
+            int itemsRemoved = this.allMarketData.RemoveAll(md => md.DateTime < cutoffTimestamp);
+            if (itemsRemoved == 0)
+                return null;
 
             decimal result = this.allMarketData.Select(md=> md.Close).Average();
             return result;
         }
-
-        /*private decimal? ProcessBySeconds(int numberOfSeconds)
-        {
-            var cutoffTimestamp = DateTime.Now.AddSeconds(numberOfSeconds * -1);
-            this.allMarketData.RemoveAll(md => md.DateTime < cutoffTimestamp);
-
-            var lastClosingValue = new Dictionary<DateTime, decimal>();
-            var lastClosingDate = new DateTime();
-
-            foreach(var singleMarketData in this.allMarketData)
-            {
-                var d = singleMarketData.DateTime;
-                var dateKey = new DateTime(d.Year, d.Month, d.Day, d.Hour, d.Minute, d.Second);
-
-                if (!lastClosingValue.ContainsKey(dateKey))
-                {
-                    lastClosingValue[dateKey] = singleMarketData.Close;
-                    continue;
-                }
-
-                if (lastClosingDate > singleMarketData.DateTime)
-                {
-                    lastClosingValue[dateKey] = singleMarketData.Close;
-                    lastClosingDate = singleMarketData.DateTime;
-                }
-            }
-
-            decimal result = lastClosingValue.Values.Average();
-            return result;
-        }*/
 
         private async Task ProcessMarketData()
         {
@@ -109,9 +80,10 @@ namespace pub_sub
 
                 if (!floatingSmaClose.HasValue)
                     continue;
-
+                
                 //await Task.Delay(new Random().Next(10, 50));
-                Hub.Default.Publish(new ProcessedMessage("sma-floating:" + floatingSmaClose));
+                string id = timeFrame.Seconds.HasValue ? $"sec:{timeFrame.Seconds.Value}" : $"tick:{timeFrame.Ticks.Value}";
+                Hub.Default.Publish(new ProcessedMessage($"sma-floating ({id}): {floatingSmaClose}"));
             }
         }
     }

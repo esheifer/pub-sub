@@ -9,7 +9,7 @@ namespace pub_sub
         static void Main(string[] args)
         { 
             var pm = new ProcessedListner();
-            var l = new SimpleMovingAverageFloatingProcessor(new TimeFrameAggregate() { Seconds = 2 });
+            var l = new SimpleMovingAverageFloatingProcessor(new TimeFrameAggregate() { Seconds = 3 });
             var l2 = new SimpleMovingAverageFloatingProcessor(new TimeFrameAggregate() { Ticks = 10 });
             var s = new MarketDataSender();
 

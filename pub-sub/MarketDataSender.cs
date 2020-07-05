@@ -19,7 +19,7 @@ namespace pub_sub
 
         public MarketDataSender()
         {
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 100; i++)
             {
                 var md = new MarketData()
                 {
@@ -29,7 +29,7 @@ namespace pub_sub
 
                 //Console.WriteLine("sending " + i.ToString());
                 hub.Publish(md);
-                //Thread.Sleep(new Random().Next(0, 100));
+                Thread.Sleep(new Random().Next(0, 100));
             }
         }
     }
